@@ -15,5 +15,5 @@ public interface ReservationService {
 	public int makeReserve(ReservationDTO reservationDTO,PayDTO paydto);
 	public int getMinTableIdx(int store_idx, String reserve_date, int reserve_cnt, String reserve_time, String reserve_table);
 	public int sendAlarmRequest(AlarmDTO alarmDTO);
-	public int checkAlarmExist(AlarmDTO alarmDTO);
+	public Integer checkAlarmExist(AlarmDTO alarmDTO);
 }

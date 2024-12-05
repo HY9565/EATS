@@ -17,5 +17,5 @@ public interface ReservationMapper {
 	public int makeReserve(ReservationDTO reservationDTO);
 	public int makePayment(PayDTO paydto);
 	public int sendAlarmRequest(AlarmDTO alarmDTO);
-	public int checkAlarmExist(AlarmDTO alarmDTO);
+	public Integer checkAlarmExist(AlarmDTO alarmDTO);
 }

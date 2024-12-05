@@ -4,22 +4,13 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
   
 <mapper namespace="com.eats.mapper.user.KakaoUserMapper">
-	<select id="kakaoIdCheck" parameterType="String" resultType="com.eats.user.model.EatsUserDTO">
+	<select id="checkKakaoExist" parameterType="String" resultType="Integer">
 		SELECT
-			E.USER_IDX, UP.USER_NICKNAME
+			USER_IDX
 		FROM
-			EATS_USER E, USER_PROFILE UP
-		WHERE 
-			E.USER_ID=#{userId}
-		AND
-			UP.USER_IDX
-				=(SELECT
-					USER_IDX
-				FROM
-					EATS_USER
-				WHERE
-					KAKAO_ID=#{kakaoId}
-				)
+			EATS_USER
+		WHERE
+			KAKAO_ID=#{kakaoId}
 	</select>
 	<insert id="insertUser" parameterType="com.eats.kakao.model.KakaoUserDTO">
 		INSERT INTO EATS_USER

@@ -7,7 +7,7 @@ import com.eats.user.model.EatsUserDTO;
 
 public interface KakaoLoginService {
 
-	public EatsUserDTO checkUserIdx(String kakaoId);
+	public Integer checkKakaoExist(String kakaoId);
 	public int insertUserAndProfile(KakaoUserDTO dto);
 	
 }

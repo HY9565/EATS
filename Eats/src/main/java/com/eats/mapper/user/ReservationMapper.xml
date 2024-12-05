@@ -257,13 +257,15 @@
 		)
 	</insert>
 	<!-- 알림신청 했는지 여부 확인 -->
-	<select id="checkAlarmExist" parameterType="com.eats.user.model.AlarmDTO" resultType="int">
+	<select id="checkAlarmExist" parameterType="com.eats.user.model.AlarmDTO" resultType="Integer">
 		SELECT
 			S_ALARM_IDX
 		FROM
 			S_ALARM
 		WHERE
 			USER_IDX=#{user_idx}
+		AND
+			STORE_IDX = #{store_idx}
 		AND 
 			S_ALARM_DATE = TO_DATE(#{s_alarm_date}, 'YYYY-MM-DD')
 		AND
