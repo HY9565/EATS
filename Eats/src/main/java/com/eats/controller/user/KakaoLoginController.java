@@ -43,7 +43,6 @@ public class KakaoLoginController {
 		}
 		
 		KakaoUserDTO kakaoUserDTO = null;
-		
 		try {
 			kakaoUserDTO = kakaoService.getKakaoInfo(accessToken);
 		} catch (JsonProcessingException e) {
@@ -59,9 +58,9 @@ public class KakaoLoginController {
 			String kakaoIdStr=String.valueOf(kakaoId);
 			String nickname=kakaoUserDTO.getNickname();
 			
-			EatsUserDTO userDTO=kLoginService.checkUserIdx(kakaoIdStr);
+			Integer kakaoUserIdx=kLoginService.checkKakaoExist(kakaoIdStr);
 			
-			if(userDTO==null) {
+			if(kakaoUserIdx==null) {
 				//DB 저장 & session 저장
 				int insertIdx=kLoginService.insertUserAndProfile(kakaoUserDTO);
 				if(insertIdx > 0) {
@@ -75,8 +74,8 @@ public class KakaoLoginController {
 				}
 			}else {
 				//세션 저장
-				int userIdx=userDTO.getUser_idx();
-				session.setAttribute("user_idx", userIdx);
+				//int userIdx=userDTO.getUser_idx();
+				session.setAttribute("user_idx", kakaoUserIdx);
 				session.setAttribute("user_nickname", nickname);
 				redirect="/";
 			}

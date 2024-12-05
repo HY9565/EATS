@@ -111,9 +111,9 @@ public class ReservationServiceImple implements ReservationService {
 	}
 	
 	@Override
-	public int checkAlarmExist(AlarmDTO alarmDTO) {
+	public Integer checkAlarmExist(AlarmDTO alarmDTO) {
 		
-		int s_alarm_idx=mapper.checkAlarmExist(alarmDTO);
+		Integer s_alarm_idx=(Integer)mapper.checkAlarmExist(alarmDTO);
 		return s_alarm_idx;
 	}
 

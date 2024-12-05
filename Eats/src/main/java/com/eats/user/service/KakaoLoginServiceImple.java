@@ -26,9 +26,9 @@ public class KakaoLoginServiceImple implements KakaoLoginService {
 	}
 	
 	@Override
-	public EatsUserDTO checkUserIdx(String kakaoId) {
-		EatsUserDTO dto=mapper.kakaoIdCheck(kakaoId);
-		return dto;
+	public Integer checkKakaoExist(String kakaoId) {
+		Integer user_idx = (Integer)mapper.checkKakaoExist(kakaoId);
+		return user_idx;
 	}
 
 	@Override

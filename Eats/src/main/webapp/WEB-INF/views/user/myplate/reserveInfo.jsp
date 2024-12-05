@@ -276,10 +276,12 @@ body{
 		</c:if>
 		</div>
 	</div>
+	<c:if test="${!empty r.request }">
 	<div class="req-wrapper">
 		<p>요청사항</p>
 		<textarea readonly="readonly">${r.request }</textarea>
 	</div>
+	</c:if>
 	<c:if test="${r.reserve_state==3 }">
 	<div class="rev-wrapper">
 		<c:if test="${!revExist }">
@@ -311,12 +313,12 @@ body{
 				<div class="rev-info-box">
 					<textarea rows="" cols="">${revInfoMap.REV_CONTENT }</textarea>
 					<div class="menu-box">
-						<c:forEach var="menu" items="${revInfoMap.revMenulist }">
+						<c:forEach var="menu" items="${revInfoMap.revMenuList }">
 						<span class="menu-list">${menu.MENU_NAME }</span>
 						</c:forEach>
 					</div>
 					<div class="tag-box">
-						<c:forEach var="tag" items="${revInfoMap.revTagList }">
+						<c:forEach var="tag" items="${revInfoMap.tagList }">
 						<span class="tag-list">${tag }</span>
 						</c:forEach>
 					</div>

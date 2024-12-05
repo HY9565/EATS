@@ -7,7 +7,7 @@ import com.eats.user.model.EatsUserDTO;
 
 public interface KakaoUserMapper {
 
-	public EatsUserDTO kakaoIdCheck(String kakaoId);
+	public Integer checkKakaoExist(String kakaoId);
 	public int insertUser(KakaoUserDTO dto);
 	public int getNewUserIdx();
 	public int insertUserProfile(Map map);

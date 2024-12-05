@@ -165,7 +165,6 @@ public class MyPlateController {
 		
 		ReviewDTO dto=new ReviewDTO(0, reserve_idx, rev_score, rev_content, null, 1, dbSave, rev_menu, rev_tag);
 		int result=reviewService.insertReview(dto);
-		System.out.println(rev_content);
 		ModelAndView mv=new ModelAndView();
 		
 		if(result>0) {
@@ -182,7 +181,6 @@ public class MyPlateController {
 				if(pointResult>0) {
 					mv.addObject("msg", "리뷰 등록 성공! 500p 지급완료!");
 					mv.addObject("goTo", "/user/myPlate");
-					System.out.println("리뷰 등록 성공! 포인트 지급 완료!");
 				}
 			}
 		}else {
@@ -199,6 +197,16 @@ public class MyPlateController {
 	public ModelAndView goMyPlate(
 			HttpSession session) {
 		Integer user_idx = (Integer)session.getAttribute("user_idx");
+		
+		ModelAndView mv=new ModelAndView();
+		
+		if(user_idx == null) {
+			mv.addObject("msg", "로그인이 필요한 서비스입니다.");
+			mv.addObject("goTo", "/user/login");
+			mv.setViewName("user/myplate/msg");
+			return mv;
+		}
+		
 		List<Map<String, BigDecimal>> cntList = myplateService.getReserveCntByState(user_idx);
 		
 		//방문예정, 방문완료, 취소노쇼의 총 예약 개수
@@ -228,8 +236,6 @@ public class MyPlateController {
 		//알림신청 목록
 		List<AlarmDTO> alarmList = myplateService.getAlarmList(user_idx);
 		
-		ModelAndView mv=new ModelAndView();
-		
 		mv.addObject("readyCnt", readyCnt);	//방문 예정 개수
 		mv.addObject("finCnt", finCnt); //방문 완료 개수
 		mv.addObject("cancledCnt", cancledCnt); //취소, 노쇼 개수
@@ -242,63 +248,80 @@ public class MyPlateController {
 	
 	//예약 상세정보 페이지
 	@GetMapping("/user/reserveInfo")
-	public ModelAndView reserveInfo(int reserve_idx) {
+	public ModelAndView reserveInfo(int reserve_idx, HttpSession session) {
+		
+		Integer user_idx = (Integer)session.getAttribute("user_idx");
+		
 		ModelAndView mv=new ModelAndView();
 		
 		ReservationDTO reservation = myplateService.getReserveInfo(reserve_idx);
 		int reserve_state=reservation.getReserve_state();
+		int db_user = reservation.getUser_idx();
+		
+		if(user_idx == null) {
+			//로그인되지 않은 경우
+			mv.addObject("msg", "로그인이 필요한 서비스입니다.");
+			mv.addObject("goTo", "/user/login");
+			mv.setViewName("user/myplate/msg");
+			return mv;
+		}else if(user_idx != db_user) {
+			//로그인한 사용자와 예약한 사용자가 다를 경우
+			mv.addObject("msg", "접근이 허용되지 않은 페이지입니다.");
+			mv.addObject("goTo", "/user/myPlate");
+			mv.setViewName("user/myplate/msg");
+			return mv;
+		}
 		
 		String state="";
 		switch (reserve_state) {
 			case 0:
-			case 1:
-				state="방문예정";
-				
+			case 1:state="방문예정"; 
+				//방문예정인 경우 방문 며칠 전인지 저장
+				int dDay=myplateService.getDday(reserve_idx);
+				mv.addObject("dDay", dDay);
 				break;
-			case 2:state="취소";break;
-			case 3:state="방문완료";break;
-			case 4:state="노쇼";break;
-			default:break;
-		}
-		if(reserve_state==3) {
-			//예약완료건의 경우 작성된 리뷰가 있는지 확인하여 저장
-			boolean revExist=myplateService.checkReviewExist(reserve_idx);
-			mv.addObject("revExist", revExist);
-			if(revExist) {
-				Map<String, Object> revInfoMap = myplateService.getRevInfo(reserve_idx);
-				String imgstr = (String)revInfoMap.get("REV_IMG");
-				if(imgstr!=null && imgstr!="") {
-					List<String> imgList = Arrays.stream(imgstr.split(","))
-							.map(String::trim)
-							.collect(Collectors.toList());
-					revInfoMap.put("imgList", imgList);
+			case 2:state="취소"; break;
+			case 3:state="방문완료"; 
+				//예약완료건의 경우 작성된 리뷰가 있는지 확인하여 저장
+				boolean revExist=myplateService.checkReviewExist(reserve_idx);
+				mv.addObject("revExist", revExist);
+				if(revExist) {
+					Map<String, Object> revInfoMap = myplateService.getRevInfo(reserve_idx);
+					String imgstr = (String)revInfoMap.get("REV_IMG");
+					if(imgstr!=null && imgstr!="") {
+						List<String> imgList = Arrays.stream(imgstr.split(","))
+								.map(String::trim)
+								.collect(Collectors.toList());
+						revInfoMap.put("imgList", imgList);
+					}
+					String tagstr=(String)revInfoMap.get("REV_TAG");
+					if(tagstr!=null && tagstr!="") {
+						List<String> tagList = Arrays.stream(tagstr.split(","))
+								.map(String::trim)
+								.collect(Collectors.toList());
+						
+						revInfoMap.put("tagList", tagList);
+					}
+					String menustr=(String)revInfoMap.get("REV_MENU");
+					if(menustr!=null && menustr!="") {
+						List<Integer> menuIdxList=Arrays.stream(menustr.split(","))
+								.map(String::trim)
+								.map(Integer::parseInt)
+								.collect(Collectors.toList());
+						
+						List<HYMenuDTO> revMenuList=storeInfoService.getRevMenuList(menuIdxList);
+						
+						revInfoMap.put("revMenuList", revMenuList);
+					}
+					mv.addObject("revInfoMap", revInfoMap);
 				}
-				String tagstr=(String)revInfoMap.get("REV_TAG");
-				if(tagstr!=null && tagstr!="") {
-					List<String> tagList = Arrays.stream(tagstr.split(","))
-							.map(String::trim)
-							.collect(Collectors.toList());
-					
-					revInfoMap.put("tagList", tagList);
-				}
-				String menustr=(String)revInfoMap.get("REV_MENU");
-				if(menustr!=null && menustr!="") {
-					List<Integer> menuIdxList=Arrays.stream(menustr.split(","))
-							.map(String::trim)
-							.map(Integer::parseInt)
-							.collect(Collectors.toList());
-					
-					List<HYMenuDTO> revMenuList=storeInfoService.getRevMenuList(menuIdxList);
-					
-					revInfoMap.put("revMenuList", revMenuList);
-				}
-				mv.addObject("revInfoMap", revInfoMap);
-			}
-		}else if(reserve_state==0 || reserve_state==1) {
-			//방문예정인 경우 방문 며칠 전인지 저장
-			int dDay=myplateService.getDday(reserve_idx);
-			System.out.println(dDay);
-			mv.addObject("dDay", dDay);
+				break;
+			case 4:state="노쇼"; break;
+			default:
+				mv.addObject("msg", "유효하지 않은 예약정보입니다.");
+				mv.addObject("goTo", "/user/myPlate");
+				mv.setViewName("user/myplate/msg");
+				return mv;
 		}
 		
 		mv.addObject("reserveDTO", reservation);
@@ -343,7 +366,6 @@ public class MyPlateController {
 			map.put("reserveList", reserveList);
 			map.put("alarmList", alarmList);
 		}
-		System.out.println(map);
 		return map;
 	}
 }

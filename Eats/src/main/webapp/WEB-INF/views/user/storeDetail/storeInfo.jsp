@@ -41,7 +41,7 @@
 							<span>${stInfo.storeDTO.parent_area_name }&nbsp;${stInfo.storeDTO.area_name }</span>
 							<c:if test="${!empty stInfo.foodType }">
 								<c:forEach var="type" items="${stInfo.foodType}" varStatus="cnt">
-								<span>${stInfo.foodType } </span>
+								<span>${type } </span>
 								</c:forEach>
 							</c:if>
 							
@@ -466,8 +466,10 @@ document.addEventListener('DOMContentLoaded', function() {
             ytimeList.forEach(time=>time.classList.remove('on'));
             ntimeList.forEach(time=>time.classList.remove('on'));
            	e.target.classList.add('on');
-            
-            getTableList();
+           	getTableList();
+           	document.getElementById('btn_wrapper').style.heigth='0px';
+        	document.getElementById('btn_wrapper').style.padding='0px';
+        	document.getElementById('btn_wrapper').innerHTML='';
         }else if(e.target.classList.contains('time-list-n')){
         	const alarmTime=e.target.textContent;
         	//선택한 시간 저장

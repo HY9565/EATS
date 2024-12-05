@@ -170,8 +170,9 @@ public class StoreInfoController {
 
 		if (user_idx != null) {
 			AlarmDTO alarmDTO = new AlarmDTO(0, user_idx, store_idx, s_alarm_date, s_alarm_time, s_alarm_count);
-
-			boolean alarmExist = reserveService.checkAlarmExist(alarmDTO) > 0 ? true : false;
+			Integer s_alarm_idx = reserveService.checkAlarmExist(alarmDTO);
+			boolean alarmExist = s_alarm_idx==null? false:true;
+			//boolean alarmExist = reserveService.checkAlarmExist(alarmDTO) > 0 ? true : false;
 
 			if (alarmExist) {
 				// 이미 알림 신청 내역이 있음
@@ -182,16 +183,19 @@ public class StoreInfoController {
 
 				int reqResult = reserveService.sendAlarmRequest(alarmDTO);
 
-				if (reqResult < 0) {
+				if (reqResult > 0) {
 					// 알림신청 성공
 					mv.addObject("msg", "알림 신청이 완료되었습니다.");
-					mv.addObject("goTo", "/");
+					mv.addObject("goTo", "/user/myPlate");
 				} else {
 					// 알림신청 실패
-					mv.addObject("msg", "알림 신청이 완료되었습니다.");
+					mv.addObject("msg", "다시 시도해주세요.");
 					mv.addObject("goTo", callback);
 				}
 			}
+		}else {
+			mv.addObject("msg", "로그인이 필요한 서비스입니다.");
+			mv.addObject("goTo", callback);
 		}
 		mv.setViewName("user/myplate/msg");
 		return mv;
